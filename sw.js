@@ -1,242 +1,52 @@
-/* sw.js */
-const CACHE_VERSION = "cashier-pro-v15-2026-04-26";
-const STATIC_CACHE = `${CACHE_VERSION}-static`;
-const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
-
-const APP_SHELL = [
-  "./",
-  "./index.html",
-  "./manifest.json",
-  "./firebase-config.js",
-
-  "https://cdn.tailwindcss.com",
-  "https://unpkg.com/@zxing/library@latest",
-  "https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js",
-  "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
-  "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
-  "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js",
-  "https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap",
-  "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-];
-
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(STATIC_CACHE)
-      .then((cache) => {
-        return Promise.allSettled(
-          APP_SHELL.map((url) => {
-            return cache.add(new Request(url, { cache: "reload" }));
-          })
-        );
-      })
-      .then(() => self.skipWaiting())
-  );
+const CACHE = 'oskar-r27-compact-fixed-ui-momen-firebase';
+const ASSETS=["index.html", "firebase-config.js", "firebase.js", "icon.svg", "manifest.webmanifest", "oskar-core-fix.js", "oskar-mobile-app-polish.js", "qr.mp3", "sw.js", "إدارة-الحسابات.html", "إضافة-المصاريف.html", "إضافة-صنف.html", "إضافة-مبيعات.html", "إضافة-مشتريات.html", "إعدادات-الباركود.html", "استيراد-العملاء-والموردين.html", "استيراد-بيانات-الأصناف.html", "استيراد-بيانات-المبيعات.html", "استيراد-كميات-افتتاحية.html", "الأجور.html", "الأكثر-مبيعا.html", "الإعدادات.html", "الديون.html", "الشحن-والتوصيل.html", "العملاء.html", "الفواتير.html", "الكاشير.html", "المخزون-التالف.html", "الموردين.html", "الموظفين.html", "تحديث-الأسعار.html", "تحويل-مالي.html", "تقرير-الأرباح.html", "تقرير-الحسابات.html", "تقرير-الديون.html", "تقرير-العملاء-والموردين.html", "تقرير-المبيعات-مفصل.html", "تقرير-المخزون.html", "تقرير-المشتريات.html", "تقرير-المصاريف.html", "تقرير-مناوبة-الموظفين.html", "حركات-الأصناف.html", "خصومات-ترويجية.html", "سجل-الحسابات.html", "سجل-الكاشير.html", "سجل-المشتريات.html", "سجل-نشاطات-الموظفين.html", "شروحات.html", "شكل-الفاتورة.html", "ضمانات-الأصناف.html", "طابعات-الإيصالات.html", "طباعة-الملصقات.html", "عروض-الأسعار.html", "فئات-المصاريف.html", "فروع-مخازن.html", "قائمة-المصاريف.html", "كاميرا-الكاشير.html", "كل-الأصناف.html", "كل-المبيعات.html", "كل-المشتريات.html", "لوحة-المتابعة.html", "ماركات-الأصناف.html", "متغيرات-الأصناف.html", "مجموعات-الأسعار.html", "مجموعات-الأصناف.html", "مجموعات-العملاء.html", "مرجع-المبيعات.html", "مرجع-المشتريات.html", "مسودات-البيع.html", "مطعم-الحجوزات.html", "مطعم-الطاولات.html", "مطعم-المطبخ.html", "مطعم-المنيو-الرقمي.html", "مطعم-الوصفات-والتكلفة.html", "مطعم-تحليلات-الأرباح.html", "مطعم-كاشير-المطعم.html", "مطعم-مخزون-المطعم.html", "معدلات-الضرائب.html", "نقل-مخزني.html", "وحدات-الأصناف.html"];
+self.addEventListener('install',event=>{
+  event.waitUntil((async()=>{
+    const cache=await caches.open(CACHE);
+    await Promise.allSettled(ASSETS.map(url=>cache.add(new Request(url,{cache:'reload'}))));
+    await self.skipWaiting();
+  })());
 });
-
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys()
-      .then((keys) => {
-        return Promise.all(
-          keys
-            .filter((key) => key !== STATIC_CACHE && key !== RUNTIME_CACHE)
-            .map((key) => caches.delete(key))
-        );
-      })
-      .then(() => self.clients.claim())
-  );
+self.addEventListener('activate',event=>{
+  event.waitUntil((async()=>{
+    const keys=await caches.keys();
+    await Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)));
+    await self.clients.claim();
+  })());
 });
-
-self.addEventListener("fetch", (event) => {
-  const req = event.request;
-
-  if (req.method !== "GET") return;
-
-  const url = new URL(req.url);
-
-  if (
-    url.protocol !== "http:" &&
-    url.protocol !== "https:"
-  ) {
-    return;
+function sameOrigin(req){try{return new URL(req.url).origin===self.location.origin}catch(e){return false}}
+function shouldNetworkOnly(req){
+  try{const u=new URL(req.url); return req.method!=='GET'||u.hostname.includes('firebaseio.com')||u.hostname.includes('googleapis.com')||u.hostname.includes('gstatic.com')||u.pathname.endsWith('/sw.js')||u.pathname.endsWith('.json');}catch(e){return true}
+}
+async function putCache(req,res){try{if(res&&res.ok&&sameOrigin(req)){const c=await caches.open(CACHE); await c.put(req,res.clone());}}catch(e){}}
+async function cacheFirst(req){
+  const cached=await caches.match(req,{ignoreSearch:true});
+  if(cached){ fetch(req).then(res=>putCache(req,res)).catch(()=>{}); return cached; }
+  try{const res=await fetch(req); await putCache(req,res); return res;}
+  catch(e){return caches.match('index.html') || Response.error();}
+}
+async function navigation(req){
+  const u=new URL(req.url);
+  const path=u.pathname.split('/').pop() || 'index.html';
+  try{const res=await fetch(req,{cache:'reload'}); await putCache(req,res); return res;}
+  catch(e){
+    const direct=await caches.match(path,{ignoreSearch:true}) || await caches.match(req,{ignoreSearch:true});
+    return direct || caches.match('index.html') || Response.error();
   }
-
-  if (req.mode === "navigate") {
-    event.respondWith(networkFirstNavigation(req));
-    return;
-  }
-
-  if (isFirebaseRequest(url)) {
-    event.respondWith(networkOnly(req));
-    return;
-  }
-
-  if (isStaticAsset(req, url)) {
-    event.respondWith(staleWhileRevalidate(req));
-    return;
-  }
-
+}
+self.addEventListener('fetch',event=>{
+  const req=event.request;
+  if(shouldNetworkOnly(req)){ event.respondWith(fetch(req).catch(()=>caches.match(req))); return; }
+  if(req.mode==='navigate'){ event.respondWith(navigation(req)); return; }
   event.respondWith(cacheFirst(req));
 });
 
-async function networkFirstNavigation(req) {
-  try {
-    const fresh = await fetch(req);
-    const cache = await caches.open(STATIC_CACHE);
-    cache.put("./index.html", fresh.clone());
-    cache.put(req, fresh.clone());
-    return fresh;
-  } catch (err) {
-    const cachedReq = await caches.match(req);
-    if (cachedReq) return cachedReq;
+// R19: native visual restoration, stable invoices, restored purchase/restaurant links
 
-    const cachedIndex = await caches.match("./index.html");
-    if (cachedIndex) return cachedIndex;
+// R19: cache refresh for native merged build
 
-    return new Response(
-      `<!DOCTYPE html>
-      <html lang="ar" dir="rtl">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>أوفلاين</title>
-        <style>
-          body{
-            margin:0;
-            min-height:100vh;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-family:Arial,sans-serif;
-            background:#eff6ff;
-            color:#0f172a;
-            direction:rtl;
-            text-align:center;
-            padding:20px;
-          }
-          .box{
-            background:white;
-            border-radius:24px;
-            padding:24px;
-            max-width:420px;
-            box-shadow:0 20px 50px rgba(15,23,42,.12);
-          }
-          h1{margin:0 0 10px;font-size:24px}
-          p{color:#64748b;line-height:1.8}
-        </style>
-      </head>
-      <body>
-        <div class="box">
-          <h1>التطبيق غير محفوظ بعد</h1>
-          <p>افتح التطبيق مرة واحدة بوجود الإنترنت حتى يتم حفظه، وبعدها سيعمل بدون إنترنت حتى مع تحديث الصفحة.</p>
-        </div>
-      </body>
-      </html>`,
-      {
-        headers: {
-          "Content-Type": "text/html; charset=UTF-8"
-        }
-      }
-    );
-  }
-}
+// R23 clean
 
-async function staleWhileRevalidate(req) {
-  const cache = await caches.open(STATIC_CACHE);
-  const cached = await cache.match(req);
+// R25 integrated modern UI, professional sync/invoice icons, accounting English, network-first HTML
 
-  const fetchPromise = fetch(req)
-    .then((fresh) => {
-      if (fresh && fresh.ok) {
-        cache.put(req, fresh.clone());
-      }
-      return fresh;
-    })
-    .catch(() => null);
-
-  return cached || fetchPromise || new Response("", { status: 504 });
-}
-
-async function cacheFirst(req) {
-  const cached = await caches.match(req);
-  if (cached) return cached;
-
-  try {
-    const fresh = await fetch(req);
-    if (fresh && fresh.ok) {
-      const cache = await caches.open(RUNTIME_CACHE);
-      cache.put(req, fresh.clone());
-    }
-    return fresh;
-  } catch (err) {
-    return new Response("", { status: 504 });
-  }
-}
-
-async function networkOnly(req) {
-  try {
-    return await fetch(req);
-  } catch (err) {
-    return new Response(
-      JSON.stringify({
-        offline: true,
-        message: "Firebase request skipped while offline"
-      }),
-      {
-        status: 503,
-        headers: {
-          "Content-Type": "application/json"
-        }
-      }
-    );
-  }
-}
-
-function isStaticAsset(req, url) {
-  const dest = req.destination;
-
-  if (
-    dest === "script" ||
-    dest === "style" ||
-    dest === "font" ||
-    dest === "image" ||
-    dest === "manifest"
-  ) {
-    return true;
-  }
-
-  return (
-    url.pathname.endsWith(".js") ||
-    url.pathname.endsWith(".css") ||
-    url.pathname.endsWith(".json") ||
-    url.pathname.endsWith(".png") ||
-    url.pathname.endsWith(".jpg") ||
-    url.pathname.endsWith(".jpeg") ||
-    url.pathname.endsWith(".webp") ||
-    url.pathname.endsWith(".svg") ||
-    url.pathname.endsWith(".woff") ||
-    url.pathname.endsWith(".woff2")
-  );
-}
-
-function isFirebaseRequest(url) {
-  return (
-    url.hostname.includes("firebaseio.com") ||
-    url.hostname.includes("googleapis.com") ||
-    url.hostname.includes("gstatic.com") && url.pathname.includes("firebase")
-  );
-}
-
-self.addEventListener("message", (event) => {
-  if (!event.data) return;
-
-  if (event.data.type === "SKIP_WAITING") {
-    self.skipWaiting();
-  }
-
-  if (event.data.type === "CLEAR_CACHE") {
-    event.waitUntil(
-      caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
-    );
-  }
-});
+// R27 compact fix: no inline page bloat, one-field rows, draggable closable modals, customer debt buttons fixed.

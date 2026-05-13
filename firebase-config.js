@@ -1,3 +1,5 @@
+// ملف إعدادات Firebase الجديد
+// تم ترك أسماء OSKAR القديمة كتوافق فقط، وكلها تشير الآن لنفس إعدادات CASHIER الجديدة.
 window.CASHIER_FIREBASE_CONFIG = {
   firebaseConfig: {
     apiKey: "AIzaSyBmFvdRJX64UEWw11eu9buhPc6kVvxVx_U",
@@ -16,3 +18,7 @@ window.CASHIER_FIREBASE_CONFIG = {
     "cashier_units_pro_momen_1d40d_885766842"
   ]
 };
+
+window.OSKAR_FIREBASE_CONFIG_READY = true;
+window.OSKAR_FIREBASE_LOGIN_KEY = window.CASHIER_FIREBASE_CONFIG.firebaseRoot;
+window.OSKAR_FIREBASE_CONFIG = window.CASHIER_FIREBASE_CONFIG.firebaseConfig;

@@ -1,0 +1,17 @@
+{
+  "name": "كاشير أوسكار المحاسبي",
+  "short_name": "كاشير أوسكار",
+  "start_url": "index.html?app=1",
+  "display": "standalone",
+  "dir": "rtl",
+  "lang": "ar",
+  "background_color": "#f4f7f7",
+  "theme_color": "#409898",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}
